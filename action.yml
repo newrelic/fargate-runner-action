@@ -43,9 +43,8 @@ runs:
         go-version: '^1.19.5'
 
     - run: |
-        go build . && ./main
+        cd ${{ github.action_path }} && go build . && ./main
       shell: bash
-
       env:
         AWS_REGION: ${{ inputs.aws_region }}
         ECS_CLUSTER_NAME: ${{ inputs.ecs_cluster_name }}
