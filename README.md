@@ -8,6 +8,12 @@ GitHub Action that allows to execute given Fargate task and stream logs back.
 In order to use this Github Action you will need to add the following code snippet to your GitHub workflow file.
 
 ```yaml
+env:
+  AWS_ASSUME_ROLE: 'arn:aws:iam::018789649883:role/caos-pipeline-oidc'
+  ANSIBLE_FORKS: 20
+
+permissions:
+  id-token: write
 
 jobs:
   test-with-fatgate:
@@ -15,19 +21,26 @@ jobs:
     runs-on: ubuntu-22.04
 
     steps:
-      - name: Publish to S3 action
-        uses: newrelic/fargate-runner-action@main
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          role-to-assume: ${{ env.AWS_ASSUME_ROLE }}
+          aws-region: us-east-2
+          
+      - name: Fargate task
+        uses: newrelic/fargate-runner-action@v1
         with:
           aws_region: us-east-2
-          container_make_target: "canaries"
-          ecs_cluster_name: caos_prerelease
-          task_definition_name: test-prerelease-td
-          cloud_watch_logs_group_name: /ecs/test-prerelease
-          cloud_watch_logs_stream_name: ecs/test-prerelease
+          container_make_target: "test"
+          ecs_cluster_name: fargate_cluster_1
+          task_definition_name: fargate_task_1
+          cloud_watch_logs_group_name: /ecs/fargate-logs
+          cloud_watch_logs_stream_name: ecs/fargate-logs
           aws_vpc_subnet: ${{ secrets.AWS_VPC_SUBNET }}
 
 
 ```
+
 
 ### Inputs
 | Key                            | Description                                                  |
@@ -40,7 +53,7 @@ jobs:
 | `cloud_watch_logs_group_name`  | AWS cloud watch logs group name. Needed to stream logs back  |
 | `cloud_watch_logs_stream_name` | AWS cloud watch logs stream name. Needed to stream logs back |
 | `log_filters`                  | List of regex filters to filter out unwanted logs            |
-| `action_id`                    | Unique ID of the execution. Required for the logs??          |
+| `action_id`                    | Unique ID of the execution. Required for the logs streaming. |
 
 ## Support
 
@@ -54,7 +67,7 @@ New Relic hosts and moderates an online forum where customers can interact with 
 
 ## Contribute
 
-We encourage your contributions to improve [project name]! Keep in mind that when you submit your pull request, you'll need to sign the CLA via the click-through using CLA-Assistant. You only have to sign the CLA one time per project.
+We encourage your contributions to improve Fargate Runner Action! Keep in mind that when you submit your pull request, you'll need to sign the CLA via the click-through using CLA-Assistant. You only have to sign the CLA one time per project.
 
 If you have any questions, or to execute our corporate CLA (which is required if your contribution is on behalf of a company), drop us an email at opensource@newrelic.com.
 
@@ -66,7 +79,7 @@ If you believe you have found a security vulnerability in this project or any of
 
 If you would like to contribute to this project, review [these guidelines](./CONTRIBUTING.md).
 
-To all contributors, we thank you!  Without your contribution, this project would not be what it is today.  We also host a community project page dedicated to [Project Name](<LINK TO https://opensource.newrelic.com/projects/... PAGE>).
+To all contributors, we thank you!  Without your contribution, this project would not be what it is today.
 
 ## License
-[Project Name] is licensed under the [Apache 2.0](http://apache.org/licenses/LICENSE-2.0.txt) License.
+Fargate Runner Action is licensed under the [Apache 2.0](http://apache.org/licenses/LICENSE-2.0.txt) License.
