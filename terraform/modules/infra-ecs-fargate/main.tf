@@ -1,3 +1,7 @@
+locals {
+    canaries_security_group = "sg-044ef7bc34691164a"
+}
+
 #########################################
 # Random string for unique names
 #########################################
@@ -167,6 +171,7 @@ module "efs" {
   subnets                        = [var.vpc_subnet_id]
   region                         = var.region
   create_security_group          = true
+  allowed_security_group_ids     = [local.canaries_security_group]
 }
 
 
