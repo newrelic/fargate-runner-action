@@ -14,6 +14,11 @@ variable "vpc_id" {
   type        = string
 }
 
+variable "vpc_subnet_id" {
+  description = "VPC ID for the EFS volume"
+  type        = string
+}
+
 # Infra to create variables
 variable "cluster_name" {
   description = "The name to AWS ECS cluster"

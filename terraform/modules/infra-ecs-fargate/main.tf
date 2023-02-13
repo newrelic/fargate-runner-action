@@ -159,11 +159,13 @@ module "ecs-fargate-task-definition" {
 #########################################
 
 module "efs" {
-  source  = "registry.terraform.io/terraform-aws-modules/efs/aws"
-  version = "1.1.1"
+  source  = "registry.terraform.io/cloudposse/efs/aws"
+  version = "0.32.7"
 
   name                           = var.efs_volume_name
-  security_group_vpc_id          = var.vpc_id
+  vpc_id                         = var.vpc_id
+  subnets                        = [var.vpc_subnet_id]
+  region                         = var.region
   create_security_group          = true
 }
 
