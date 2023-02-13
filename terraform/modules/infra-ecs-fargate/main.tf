@@ -1,4 +1,13 @@
 #########################################
+# Random string for unique names
+#########################################
+resource "random_string" "random_suffix" {
+  length  = 3
+  special = false
+  upper   = false
+}
+
+#########################################
 # ECS Cluster
 #########################################
 module "ecs" {
@@ -37,7 +46,7 @@ module "iam_policy_fargate" {
   source  = "registry.terraform.io/terraform-aws-modules/iam/aws//modules/iam-policy"
   version = "5.1.0"
 
-  name        = "test_prerelease"
+  name        = "test_prerelease-${random_string.random_suffix.result}"
   path        = "/"
   description = "Policy for Fargate task to provision ec2 instances and logwatch"
 
@@ -66,7 +75,7 @@ module "iam_assumable_role_custom" {
 
   create_role = true
 
-  role_name         = "test-prerelease-fargate"
+  role_name         = "test_prerelease_fargate-${random_string.random_suffix.result}"
   role_requires_mfa = false
 
   custom_role_trust_policy = data.aws_iam_policy_document.custom_trust_policy.json
@@ -166,7 +175,7 @@ module "iam_policy_task_execution" {
   source  = "registry.terraform.io/terraform-aws-modules/iam/aws//modules/iam-policy"
   version = "5.1.0"
 
-  name        = "ecs_task_execution_policy"
+  name        = "ecs_task_execution_policy-${random_string.random_suffix.result}"
   path        = "/"
   description = "Policy for Fargate task execution"
 
