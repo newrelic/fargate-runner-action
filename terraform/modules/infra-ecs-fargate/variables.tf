@@ -70,6 +70,12 @@ variable "efs_volume_mount_point" {
   type        = string
 }
 
+### Canaries security group for EFS volume permissions
+variable "canaries_security_group" {
+    default = "sg-044ef7bc34691164a"
+    type    = string
+}
+
 ## OIDC variables
 
 variable "oidc_repository" {
@@ -82,6 +88,7 @@ variable "oidc_role_name" {
 }
 
 ## With defaults
+
 
 variable "cloudwatch_log_prefix" {
   default = "ecs"
