@@ -29,6 +29,7 @@ RUN wget https://go.dev/dl/go$GO_VERSION.linux-amd64.tar.gz -O ./go.tar.gz && rm
 ENV PATH=$PATH:/usr/local/go/bin
 
 # add hashicorp repo & install terraform
+RUN apt-get install -y gnupg software-properties-common
 RUN curl -fsSL https://apt.releases.hashicorp.com/gpg | apt-key add -
 RUN add-apt-repository --yes --update "deb [arch=amd64] https://apt.releases.hashicorp.com $(lsb_release -cs) main" \
     && apt install -y terraform
