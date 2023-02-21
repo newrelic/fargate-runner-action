@@ -28,6 +28,11 @@ RUN wget "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip"  && unzip aw
 RUN wget https://go.dev/dl/go$GO_VERSION.linux-amd64.tar.gz -O ./go.tar.gz && rm -rf /usr/local/go && tar -C /usr/local -xzf ./go.tar.gz
 ENV PATH=$PATH:/usr/local/go/bin
 
+# add hashicorp repo & install terraform
+RUN curl -fsSL https://apt.releases.hashicorp.com/gpg | apt-key add -
+RUN add-apt-repository --yes --update "deb [arch=amd64] https://apt.releases.hashicorp.com $(lsb_release -cs) main" \
+    && apt install -y terraform
+
 RUN mkdir ~/.ssh/
 
 COPY ./entrypoint.sh /entrypoint.sh
