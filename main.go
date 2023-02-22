@@ -36,6 +36,7 @@ type Config struct {
 	TimeoutMillis            int
 	LogFilters               []string // To show full logs, set LOG_FILTERS=".*"
 	ActionID                 string   // Used to distinguish the job that launched the action
+	RepoName                 string   // Repo to clone by the Docker image (container)
 }
 
 const (
@@ -59,6 +60,7 @@ func LoadConfig() Config {
 	viper.BindEnv("max_log_lines")
 	viper.BindEnv("log_filters")
 	viper.BindEnv("action_id")
+	viper.BindEnv("repo_name")
 
 	timeoutMillis := viper.GetInt("timeout_millis")
 	if timeoutMillis == 0 {
@@ -87,6 +89,7 @@ func LoadConfig() Config {
 		TimeoutMillis:            timeoutMillis,
 		MaxLogLines:              maxLogLines,
 		ActionID:                 actionID,
+		RepoName:                 viper.GetString("repo_name"),
 	}
 }
 
@@ -143,7 +146,7 @@ func prepareFargateTask(params Config) (*TaskRunner, aws.Config) {
 		ctx, cancelFn := context.WithTimeout(context.Background(), time.Duration(params.TimeoutMillis)*time.Millisecond)
 		defer cancelFn()
 
-		containers, err := containerOverride.GetContainersOverride(ctx, params.ContainerMakeTarget)
+		containers, err := containerOverride.GetContainersOverride(ctx, params.ContainerMakeTarget, params.RepoName)
 		if err != nil {
 			log.Fatalf("failed: %v", err)
 		}
@@ -245,7 +248,7 @@ func NewContainerOverride(taskDefinition *ecs.DescribeTaskDefinitionInput, awsCl
 }
 
 // GetContainerOverride returns a container configuration with a new command
-func (co *ContainerOverride) GetContainersOverride(ctx context.Context, command []string) ([]ecsTypes.ContainerOverride, error) {
+func (co *ContainerOverride) GetContainersOverride(ctx context.Context, command []string, repoName string) ([]ecsTypes.ContainerOverride, error) {
 	var err error
 	task, err := co.awsClient.DescribeTaskDefinition(ctx, co.specs)
 	if err != nil {
@@ -255,9 +258,16 @@ func (co *ContainerOverride) GetContainersOverride(ctx context.Context, command 
 	containerOverrides := make([]ecsTypes.ContainerOverride, len(task.TaskDefinition.ContainerDefinitions))
 
 	for i, container := range task.TaskDefinition.ContainerDefinitions {
+		containerEnvironment := container.Environment
+		if repoName != "" {
+			containerEnvironment = append(containerEnvironment, ecsTypes.KeyValuePair{
+				Name:  aws.String("repo_name"),
+				Value: aws.String(repoName),
+			})
+		}
 		containerOverrides[i] = ecsTypes.ContainerOverride{
 			Name:                 container.Name,
-			Environment:          container.Environment,
+			Environment:          containerEnvironment,
 			EnvironmentFiles:     container.EnvironmentFiles,
 			Command:              command,
 			ResourceRequirements: container.ResourceRequirements,

@@ -35,6 +35,9 @@ inputs:
     description: Identifier for the job that triggered the action.
     default: ${{ github.job }}
     required: false
+  repo_name:
+    description: Repository to clone by the runner to execute make target.
+    required: true
 runs:
   using: "composite"
   steps:
@@ -55,3 +58,4 @@ runs:
         AWS_VPC_SUBNET: ${{ inputs.aws_vpc_subnet }}
         LOG_FILTERS: ${{ inputs.log_filters }}
         ACTION_ID: ${{ inputs.action_id }}
+        REPO_NAME: ${{ inputs.repo_name }}
