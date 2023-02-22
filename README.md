@@ -40,6 +40,7 @@ jobs:
           aws_vpc_subnet: ${{ secrets.AWS_VPC_SUBNET }}
           action_id: "some uniq string"
           repo_name: "newrelic/infrastructure-agent"
+          ref: "main"
 
 
 ```
@@ -58,6 +59,7 @@ jobs:
 | `log_filters`                  | List of regex filters to filter out unwanted logs                         |
 | `action_id`                    | Unique ID of the execution. Required for the logs streaming.              |
 | `repo_name`                    | Repo name to clone by the docker. Example: newrelic/infrastructure-agent. |
+| `ref`                          | Branch or TAG to be checked out in the docker container.                  |
 
 ## Support
 

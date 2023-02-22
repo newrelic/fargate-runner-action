@@ -38,6 +38,9 @@ inputs:
   repo_name:
     description: Repository to clone by the runner to execute make target.
     required: true
+  ref:
+    description: Reference to checkout, for example main.
+    required: true
 runs:
   using: "composite"
   steps:
@@ -59,3 +62,4 @@ runs:
         LOG_FILTERS: ${{ inputs.log_filters }}
         ACTION_ID: ${{ inputs.action_id }}
         REPO_NAME: ${{ inputs.repo_name }}
+        REF: ${{ inputs.ref }}
