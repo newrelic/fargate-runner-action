@@ -38,7 +38,6 @@ jobs:
           cloud_watch_logs_group_name: /ecs/fargate-logs
           cloud_watch_logs_stream_name: ecs/fargate-logs
           aws_vpc_subnet: ${{ secrets.AWS_VPC_SUBNET }}
-          action_id: "some uniq string"
           repo_name: "newrelic/infrastructure-agent"
           ref: "main"
 
@@ -57,7 +56,6 @@ jobs:
 | `cloud_watch_logs_group_name`  | AWS cloud watch logs group name. Needed to stream logs back               |
 | `cloud_watch_logs_stream_name` | AWS cloud watch logs stream name. Needed to stream logs back              |
 | `log_filters`                  | List of regex filters to filter out unwanted logs                         |
-| `action_id`                    | Unique ID of the execution. Required for the logs streaming.              |
 | `repo_name`                    | Repo name to clone by the docker. Example: newrelic/infrastructure-agent. |
 | `ref`                          | Branch or TAG to be checked out in the docker container.                  |
 

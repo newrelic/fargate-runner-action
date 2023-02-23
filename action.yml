@@ -31,10 +31,6 @@ inputs:
       PLAY\sRECAP\s
       ok=\d+\s+changed=\d+\s+unreachable=\d+\s+failed=\d+\s+skipped=\d+\s+rescued=\d+\s+ignored=\d+
     required: false
-  action_id:
-    description: Identifier for the job that triggered the action.
-    default: ${{ github.job }}
-    required: false
   repo_name:
     description: Repository to clone by the runner to execute make target.
     required: true
@@ -60,6 +56,5 @@ runs:
         CLOUD_WATCH_LOGS_STREAM_NAME: ${{ inputs.cloud_watch_logs_stream_name }}
         AWS_VPC_SUBNET: ${{ inputs.aws_vpc_subnet }}
         LOG_FILTERS: ${{ inputs.log_filters }}
-        ACTION_ID: ${{ inputs.action_id }}
         REPO_NAME: ${{ inputs.repo_name }}
         REF: ${{ inputs.ref }}

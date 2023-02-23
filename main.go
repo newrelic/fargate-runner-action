@@ -35,7 +35,6 @@ type Config struct {
 	MaxLogLines              int
 	TimeoutMillis            int
 	LogFilters               []string // To show full logs, set LOG_FILTERS=".*"
-	ActionID                 string   // Used to distinguish the job that launched the action
 	RepoName                 string   // Repo to clone by the Docker image (container)
 	Ref                      string   // Reference to clone, no default
 }
@@ -43,8 +42,6 @@ type Config struct {
 const (
 	defaultTimeoutMillis = 240000
 	defaultMaxLogLines   = 200
-
-	defaultActionID = "unknown"
 
 	logLinesReqBackoff = 5 * time.Second
 )
@@ -60,7 +57,6 @@ func LoadConfig() Config {
 	viper.BindEnv("timeout_millis")
 	viper.BindEnv("max_log_lines")
 	viper.BindEnv("log_filters")
-	viper.BindEnv("action_id")
 	viper.BindEnv("repo_name")
 	viper.BindEnv("ref")
 
@@ -73,12 +69,7 @@ func LoadConfig() Config {
 	if maxLogLines == 0 {
 		maxLogLines = defaultMaxLogLines
 	}
-
-	actionID := viper.GetString("action_id")
-	if actionID == "" {
-		actionID = defaultActionID
-	}
-
+	
 	return Config{
 		AWSRegion:                viper.GetString("aws_region"),
 		ECSClusterName:           viper.GetString("ecs_cluster_name"),
@@ -90,7 +81,6 @@ func LoadConfig() Config {
 		LogFilters:               viper.GetStringSlice("log_filters"),
 		TimeoutMillis:            timeoutMillis,
 		MaxLogLines:              maxLogLines,
-		ActionID:                 actionID,
 		RepoName:                 viper.GetString("repo_name"),
 		Ref:                      viper.GetString("ref"),
 	}
@@ -232,8 +222,8 @@ func printLogsInfo(params Config, taskID string) {
 	fmt.Fprintf(log.Writer(), "    tools/aws_logs.sh --group-name=/%s --stream-name=%s --tail\n",
 		params.CloudWatchLogsStreamName, source)
 	fmt.Fprintf(log.Writer(), "Download full logs:\n")
-	fmt.Fprintf(log.Writer(), "    tools/aws_logs.sh --group-name=/%s --stream-name=%s --output-file=%s.txt\n",
-		params.CloudWatchLogsStreamName, source, params.ActionID)
+	fmt.Fprintf(log.Writer(), "    tools/aws_logs.sh --group-name=/%s --stream-name=%s --output-file=aws_logs_%d.txt\n",
+		params.CloudWatchLogsStreamName, source, time.Now().Unix())
 }
 
 // ContainerOverride returns a list of containers definition with an override command
