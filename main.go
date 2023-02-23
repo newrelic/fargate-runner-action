@@ -69,7 +69,7 @@ func LoadConfig() Config {
 	if maxLogLines == 0 {
 		maxLogLines = defaultMaxLogLines
 	}
-	
+
 	return Config{
 		AWSRegion:                viper.GetString("aws_region"),
 		ECSClusterName:           viper.GetString("ecs_cluster_name"),
@@ -220,10 +220,10 @@ func printLogsInfo(params Config, taskID string) {
 	fmt.Fprintf(log.Writer(), "Fetching logs from: %s\n", source)
 	fmt.Fprintf(log.Writer(), "Tail logs:\n")
 	fmt.Fprintf(log.Writer(), "    tools/aws_logs.sh --group-name=/%s --stream-name=%s --tail\n",
-		params.CloudWatchLogsStreamName, source)
+		params.CloudWatchLogsGroupName, source)
 	fmt.Fprintf(log.Writer(), "Download full logs:\n")
 	fmt.Fprintf(log.Writer(), "    tools/aws_logs.sh --group-name=/%s --stream-name=%s --output-file=aws_logs_%d.txt\n",
-		params.CloudWatchLogsStreamName, source, time.Now().Unix())
+		params.CloudWatchLogsGroupName, source, time.Now().Unix())
 }
 
 // ContainerOverride returns a list of containers definition with an override command
