@@ -35,14 +35,13 @@ type Config struct {
 	MaxLogLines              int
 	TimeoutMillis            int
 	LogFilters               []string // To show full logs, set LOG_FILTERS=".*"
-	ActionID                 string   // Used to distinguish the job that launched the action
+	RepoName                 string   // Repo to clone by the Docker image (container)
+	Ref                      string   // Reference to clone, no default
 }
 
 const (
 	defaultTimeoutMillis = 240000
 	defaultMaxLogLines   = 200
-
-	defaultActionID = "unknown"
 
 	logLinesReqBackoff = 5 * time.Second
 )
@@ -58,7 +57,8 @@ func LoadConfig() Config {
 	viper.BindEnv("timeout_millis")
 	viper.BindEnv("max_log_lines")
 	viper.BindEnv("log_filters")
-	viper.BindEnv("action_id")
+	viper.BindEnv("repo_name")
+	viper.BindEnv("ref")
 
 	timeoutMillis := viper.GetInt("timeout_millis")
 	if timeoutMillis == 0 {
@@ -69,12 +69,7 @@ func LoadConfig() Config {
 	if maxLogLines == 0 {
 		maxLogLines = defaultMaxLogLines
 	}
-
-	actionID := viper.GetString("action_id")
-	if actionID == "" {
-		actionID = defaultActionID
-	}
-
+	
 	return Config{
 		AWSRegion:                viper.GetString("aws_region"),
 		ECSClusterName:           viper.GetString("ecs_cluster_name"),
@@ -86,7 +81,8 @@ func LoadConfig() Config {
 		LogFilters:               viper.GetStringSlice("log_filters"),
 		TimeoutMillis:            timeoutMillis,
 		MaxLogLines:              maxLogLines,
-		ActionID:                 actionID,
+		RepoName:                 viper.GetString("repo_name"),
+		Ref:                      viper.GetString("ref"),
 	}
 }
 
@@ -143,7 +139,7 @@ func prepareFargateTask(params Config) (*TaskRunner, aws.Config) {
 		ctx, cancelFn := context.WithTimeout(context.Background(), time.Duration(params.TimeoutMillis)*time.Millisecond)
 		defer cancelFn()
 
-		containers, err := containerOverride.GetContainersOverride(ctx, params.ContainerMakeTarget)
+		containers, err := containerOverride.GetContainersOverride(ctx, params.ContainerMakeTarget, params.RepoName, params.Ref)
 		if err != nil {
 			log.Fatalf("failed: %v", err)
 		}
@@ -226,8 +222,8 @@ func printLogsInfo(params Config, taskID string) {
 	fmt.Fprintf(log.Writer(), "    tools/aws_logs.sh --group-name=/%s --stream-name=%s --tail\n",
 		params.CloudWatchLogsStreamName, source)
 	fmt.Fprintf(log.Writer(), "Download full logs:\n")
-	fmt.Fprintf(log.Writer(), "    tools/aws_logs.sh --group-name=/%s --stream-name=%s --output-file=%s.txt\n",
-		params.CloudWatchLogsStreamName, source, params.ActionID)
+	fmt.Fprintf(log.Writer(), "    tools/aws_logs.sh --group-name=/%s --stream-name=%s --output-file=aws_logs_%d.txt\n",
+		params.CloudWatchLogsStreamName, source, time.Now().Unix())
 }
 
 // ContainerOverride returns a list of containers definition with an override command
@@ -245,7 +241,7 @@ func NewContainerOverride(taskDefinition *ecs.DescribeTaskDefinitionInput, awsCl
 }
 
 // GetContainerOverride returns a container configuration with a new command
-func (co *ContainerOverride) GetContainersOverride(ctx context.Context, command []string) ([]ecsTypes.ContainerOverride, error) {
+func (co *ContainerOverride) GetContainersOverride(ctx context.Context, command []string, repoName, ref string) ([]ecsTypes.ContainerOverride, error) {
 	var err error
 	task, err := co.awsClient.DescribeTaskDefinition(ctx, co.specs)
 	if err != nil {
@@ -255,9 +251,23 @@ func (co *ContainerOverride) GetContainersOverride(ctx context.Context, command 
 	containerOverrides := make([]ecsTypes.ContainerOverride, len(task.TaskDefinition.ContainerDefinitions))
 
 	for i, container := range task.TaskDefinition.ContainerDefinitions {
+		containerEnvironment := container.Environment
+		if repoName != "" {
+			containerEnvironment = append(containerEnvironment, ecsTypes.KeyValuePair{
+				Name:  aws.String("REPO_NAME"),
+				Value: aws.String(repoName),
+			})
+		}
+		if ref != "" {
+			containerEnvironment = append(containerEnvironment, ecsTypes.KeyValuePair{
+				Name:  aws.String("REF"),
+				Value: aws.String(ref),
+			})
+		}
+
 		containerOverrides[i] = ecsTypes.ContainerOverride{
 			Name:                 container.Name,
-			Environment:          container.Environment,
+			Environment:          containerEnvironment,
 			EnvironmentFiles:     container.EnvironmentFiles,
 			Command:              command,
 			ResourceRequirements: container.ResourceRequirements,
