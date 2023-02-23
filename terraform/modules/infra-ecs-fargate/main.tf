@@ -58,6 +58,11 @@ module "iam_policy_fargate" {
             "Action": "ec2:*",
             "Effect": "Allow",
             "Resource": "*"
+        },
+        {
+            "Action": "s3:*",
+            "Effect": "Allow",
+            "Resource": ["${var.s3_terraform_bucket_arn}", "${var.s3_terraform_bucket_arn}/*"]
         }
     ]
 }
