@@ -30,6 +30,11 @@ variable "cloudwatch_log_group" {
   type        = string
 }
 
+variable "s3_terraform_bucket_arn" {
+  description = "S3 bucket ARN for ECS cluster permissions"
+  type        = string
+}
+
 variable "task_container_image" {
   description = "Task definition container image"
   type        = string
