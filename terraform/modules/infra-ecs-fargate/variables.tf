@@ -70,6 +70,12 @@ variable "efs_volume_mount_point" {
   type        = string
 }
 
+variable "additional_efs_security_group_rules" {
+  description = "Efs volume mount point"
+  type        = list(any)
+  default     = []
+}
+
 ### Canaries security group for EFS volume permissions
 variable "canaries_security_group" {
     default = "sg-044ef7bc34691164a"

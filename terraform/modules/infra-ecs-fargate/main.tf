@@ -168,6 +168,7 @@ module "efs" {
   region                         = var.region
   create_security_group          = true
   allowed_security_group_ids     = [var.canaries_security_group]
+  additional_security_group_rules = var.additional_efs_security_group_rules
 }
 
 
