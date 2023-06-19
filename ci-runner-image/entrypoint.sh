@@ -9,6 +9,7 @@ fi
 
 echo "$SSH_KEY" | base64 --decode > ~/.ssh/caos-dev-arm.cer
 chmod 600  ~/.ssh/caos-dev-arm.cer
+cp ~/.ssh/caos-dev-arm.cer ~/.ssh/id_rsa
 
 git clone https://github.com/"${REPO_NAME}".git /srv/"${REPO_NAME}"
 
