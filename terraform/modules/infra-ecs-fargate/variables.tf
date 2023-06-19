@@ -108,6 +108,7 @@ variable "cloudwatch_log_prefix" {
 }
 
 variable "tags" {
+  type = map
   default = {
     owning_team = "CAOS"
   }
