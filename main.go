@@ -36,6 +36,7 @@ type Config struct {
 	TimeoutMillis            int
 	LogFilters               []string // To show full logs, set LOG_FILTERS=".*"
 	RepoName                 string   // Repo to clone by the Docker image (container)
+	GitCloneURL              string   // Full repository URL for cloning
 	Ref                      string   // Reference to clone, no default
 }
 
@@ -58,6 +59,7 @@ func LoadConfig() Config {
 	viper.BindEnv("max_log_lines")
 	viper.BindEnv("log_filters")
 	viper.BindEnv("repo_name")
+	viper.BindEnv("git_clone_url")
 	viper.BindEnv("ref")
 
 	timeoutMillis := viper.GetInt("timeout_millis")
@@ -82,6 +84,7 @@ func LoadConfig() Config {
 		TimeoutMillis:            timeoutMillis,
 		MaxLogLines:              maxLogLines,
 		RepoName:                 viper.GetString("repo_name"),
+		GitCloneURL:              viper.GetString("git_clone_url"),
 		Ref:                      viper.GetString("ref"),
 	}
 }
@@ -139,7 +142,7 @@ func prepareFargateTask(params Config) (*TaskRunner, aws.Config) {
 		ctx, cancelFn := context.WithTimeout(context.Background(), time.Duration(params.TimeoutMillis)*time.Millisecond)
 		defer cancelFn()
 
-		containers, err := containerOverride.GetContainersOverride(ctx, params.ContainerMakeTarget, params.RepoName, params.Ref)
+		containers, err := containerOverride.GetContainersOverride(ctx, params.ContainerMakeTarget, params.RepoName, params.GitCloneURL, params.Ref)
 		if err != nil {
 			log.Fatalf("failed: %v", err)
 		}
@@ -241,7 +244,7 @@ func NewContainerOverride(taskDefinition *ecs.DescribeTaskDefinitionInput, awsCl
 }
 
 // GetContainerOverride returns a container configuration with a new command
-func (co *ContainerOverride) GetContainersOverride(ctx context.Context, command []string, repoName, ref string) ([]ecsTypes.ContainerOverride, error) {
+func (co *ContainerOverride) GetContainersOverride(ctx context.Context, command []string, repoName, gitCloneURL, ref string) ([]ecsTypes.ContainerOverride, error) {
 	var err error
 	task, err := co.awsClient.DescribeTaskDefinition(ctx, co.specs)
 	if err != nil {
@@ -256,6 +259,12 @@ func (co *ContainerOverride) GetContainersOverride(ctx context.Context, command 
 			containerEnvironment = append(containerEnvironment, ecsTypes.KeyValuePair{
 				Name:  aws.String("REPO_NAME"),
 				Value: aws.String(repoName),
+			})
+		}
+		if gitCloneURL != "" {
+			containerEnvironment = append(containerEnvironment, ecsTypes.KeyValuePair{
+				Name:  aws.String("GIT_CLONE_URL"),
+				Value: aws.String(gitCloneURL),
 			})
 		}
 		if ref != "" {

@@ -11,7 +11,10 @@ echo "$SSH_KEY" | base64 --decode > ~/.ssh/caos-dev-arm.cer
 chmod 600  ~/.ssh/caos-dev-arm.cer
 cp ~/.ssh/caos-dev-arm.cer ~/.ssh/id_rsa
 
-git clone https://github.com/"${REPO_NAME}".git /srv/"${REPO_NAME}"
+if [ -z "${GIT_CLONE_URL}" ]; then
+    GIT_CLONE_URL=https://github.com/"${REPO_NAME}".git
+fi
+git clone "${GIT_CLONE_URL}" /srv/"${REPO_NAME}"
 
 pushd "/srv/$REPO_NAME"
 
