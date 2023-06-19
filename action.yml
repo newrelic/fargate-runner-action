@@ -60,4 +60,5 @@ runs:
         AWS_VPC_SUBNET: ${{ inputs.aws_vpc_subnet }}
         LOG_FILTERS: ${{ inputs.log_filters }}
         REPO_NAME: ${{ inputs.repo_name }}
+        GIT_CLONE_URL: ${{ inputs.git_clone_url }}
         REF: ${{ inputs.ref }}
