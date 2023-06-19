@@ -10,6 +10,8 @@ fi
 echo "$SSH_KEY" | base64 --decode > ~/.ssh/caos-dev-arm.cer
 chmod 600  ~/.ssh/caos-dev-arm.cer
 
+ssh-keyscan -t rsa github.com >> ~/.ssh/known_hosts
+
 if [ -z "${GIT_CLONE_URL}" ]; then
     GIT_CLONE_URL=https://github.com/"${REPO_NAME}".git
 fi
