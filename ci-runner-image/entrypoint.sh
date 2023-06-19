@@ -14,7 +14,7 @@ cp ~/.ssh/caos-dev-arm.cer ~/.ssh/id_rsa
 if [ -z "${GIT_CLONE_URL}" ]; then
     GIT_CLONE_URL=https://github.com/"${REPO_NAME}".git
 fi
-git clone "${GIT_CLONE_URL}" /srv/"${REPO_NAME}"
+git clone --config core.sshCommand="ssh -i ~/.ssh/id_rsa" "${GIT_CLONE_URL}" /srv/"${REPO_NAME}"
 
 pushd "/srv/$REPO_NAME"
 
