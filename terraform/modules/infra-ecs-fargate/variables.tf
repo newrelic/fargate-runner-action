@@ -107,6 +107,13 @@ variable "cloudwatch_log_prefix" {
   type        = string
 }
 
+variable "tags" {
+  type = map
+  default = {
+    owning_team = "CAOS"
+  }
+}
+
 variable "task_container_cpu" {
   default = "4096"
 }

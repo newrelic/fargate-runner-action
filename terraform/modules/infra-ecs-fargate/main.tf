@@ -22,9 +22,7 @@ module "ecs" {
     }
   ]
 
-  tags = {
-    owning_team = "CAOS"
-  }
+  tags = var.tags
 }
 
 #########################################
@@ -36,6 +34,8 @@ module "cloudwatch_log-group" {
 
   name              = var.cloudwatch_log_group
   retention_in_days = 14
+
+  tags = var.tags
 }
 
 
@@ -68,9 +68,7 @@ module "iam_policy_fargate" {
 }
 EOF
 
-  tags = {
-    owning_team = "CAOS"
-  }
+  tags = var.tags
 }
 
 
@@ -88,6 +86,8 @@ module "iam_assumable_role_custom" {
   custom_role_policy_arns = [
     module.iam_policy_fargate.arn
   ]
+
+  tags = var.tags
 }
 
 data "aws_iam_policy_document" "custom_trust_policy" {
@@ -156,6 +156,8 @@ module "ecs-fargate-task-definition" {
       "awslogs-stream-prefix" : var.cloudwatch_log_prefix
     }
   }
+
+  tags = var.tags
 }
 
 
@@ -174,6 +176,8 @@ module "efs" {
   create_security_group          = true
   allowed_security_group_ids     = [var.canaries_security_group]
   additional_security_group_rules = var.additional_efs_security_group_rules
+
+  tags = var.tags
 }
 
 
@@ -218,9 +222,7 @@ module "iam_policy_task_execution" {
 }
 EOF
 
-  tags = {
-    owning_team = "CAOS"
-  }
+  tags = var.tags
 }
 
 #########################################
@@ -244,7 +246,5 @@ module "iam_iam-assumable-role-with-oidc" {
   role_policy_arns      = [
     module.iam_policy_task_execution.arn
   ]
-  tags = {
-    "owning_team" : "CAOS"
-  }
+  tags = var.tags
 }
