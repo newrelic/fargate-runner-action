@@ -32,8 +32,11 @@ inputs:
       ok=\d+\s+changed=\d+\s+unreachable=\d+\s+failed=\d+\s+skipped=\d+\s+rescued=\d+\s+ignored=\d+
     required: false
   repo_name:
-    description: Repository to clone by the runner to execute make target.
+    description: Repository name to clone by the runner to execute make target.
     required: true
+  git_clone_url:
+    description: Full URL of the repository to clone by the runner to execute make target.
+    required: false 
   ref:
     description: Reference to checkout, for example main.
     required: true
