@@ -125,3 +125,9 @@ variable "task_container_memory" {
 variable "task_container_memory_reservation" {
   default = "2048"
 }
+
+variable "iam_permissions_boundary_policy_arn" {
+  default = ""
+  description = "A policy boundary to limit the permissions granted to the IAM roles created by this module"
+  type = string
+}
