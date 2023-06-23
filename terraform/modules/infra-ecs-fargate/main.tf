@@ -87,6 +87,8 @@ module "iam_assumable_role_custom" {
     module.iam_policy_fargate.arn
   ]
 
+  role_permissions_boundary_arn = var.iam_permissions_boundary_policy_arn
+
   tags = var.tags
 }
 
@@ -243,6 +245,7 @@ module "iam_iam-assumable-role-with-oidc" {
   force_detach_policies = true
   max_session_duration  = 43200
   aws_account_id        = var.account_id
+  role_permissions_boundary_arn = var.iam_permissions_boundary_policy_arn
   role_policy_arns      = [
     module.iam_policy_task_execution.arn
   ]
