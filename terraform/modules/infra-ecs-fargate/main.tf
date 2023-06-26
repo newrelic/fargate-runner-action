@@ -146,6 +146,7 @@ module "ecs-fargate-task-definition" {
   task_role_arn                           = module.iam_assumable_role_custom.iam_role_arn
 
   ecs_task_execution_role_custom_policies = var.task_custom_policies
+  permissions_boundary                    = var.iam_permissions_boundary_policy_arn
 
   secrets = var.task_secrets
 
