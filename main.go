@@ -30,6 +30,7 @@ type Config struct {
 	TaskDefinitionName       string
 	ContainerMakeTarget      []string // If is set as a string it will unmarshall as a slice with 1 string
 	AWSVpcSubnet             string
+	AWSVpcSecurityGroups     []string // Up to 5 security groups can be provided: https://docs.aws.amazon.com/AmazonECS/latest/APIReference/API_AwsVpcConfiguration.html
 	CloudWatchLogsGroupName  string
 	CloudWatchLogsStreamName string
 	MaxLogLines              int
@@ -53,6 +54,7 @@ func LoadConfig() Config {
 	viper.BindEnv("task_definition_name")
 	viper.BindEnv("container_make_target")
 	viper.BindEnv("aws_vpc_subnet")
+	viper.BindEnv("aws_vpc_security_groups")
 	viper.BindEnv("cloud_watch_logs_group_name")
 	viper.BindEnv("cloud_watch_logs_stream_name")
 	viper.BindEnv("timeout_millis")
@@ -78,6 +80,7 @@ func LoadConfig() Config {
 		TaskDefinitionName:       viper.GetString("task_definition_name"),
 		ContainerMakeTarget:      viper.GetStringSlice("container_make_target"),
 		AWSVpcSubnet:             viper.GetString("aws_vpc_subnet"),
+		AWSVpcSecurityGroups:     viper.GetStringSlice("aws_vpc_security_groups"),
 		CloudWatchLogsGroupName:  viper.GetString("cloud_watch_logs_group_name"),
 		CloudWatchLogsStreamName: viper.GetString("cloud_watch_logs_stream_name"),
 		LogFilters:               viper.GetStringSlice("log_filters"),
@@ -126,7 +129,8 @@ func prepareFargateTask(params Config) (*TaskRunner, aws.Config) {
 
 		NetworkConfiguration: &ecsTypes.NetworkConfiguration{
 			AwsvpcConfiguration: &ecsTypes.AwsVpcConfiguration{
-				Subnets: []string{params.AWSVpcSubnet},
+				Subnets:        []string{params.AWSVpcSubnet},
+				SecurityGroups: params.AWSVpcSecurityGroups,
 			},
 		},
 	}

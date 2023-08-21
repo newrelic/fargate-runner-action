@@ -22,6 +22,9 @@ inputs:
   aws_vpc_subnet:
     description: Task Definition.
     required: true
+  aws_vpc_security_group:
+    description: Security group to be used by the task. If not specified, the default security group of the VPC will be used.
+    required: false
   log_filters:
     description: Regexp filters that will be applied to CloudWatch output. To show the full logs add the following filter ".*". By default, it filters Ansible role execution logs.
     default: |
