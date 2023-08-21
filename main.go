@@ -5,7 +5,6 @@ package main
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 	"io"
 	"log"
@@ -135,10 +134,7 @@ func prepareFargateTask(params Config) (*TaskRunner, aws.Config) {
 			},
 		},
 	}
-
-	taskSpecJson, _ := json.Marshal(taskSpecs)
-	log.Printf("Task specification: %v", string(taskSpecJson))
-
+	
 	// modify task input if command is specified
 	if len(params.ContainerMakeTarget) > 0 {
 		taskDefinition := &ecs.DescribeTaskDefinitionInput{
