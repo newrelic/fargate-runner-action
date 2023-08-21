@@ -22,7 +22,7 @@ inputs:
   aws_vpc_subnet:
     description: Task Definition.
     required: true
-  aws_vpc_security_group:
+  aws_vpc_security_groups:
     description: Security group to be used by the task. If not specified, the default security group of the VPC will be used.
     required: false
   log_filters:
