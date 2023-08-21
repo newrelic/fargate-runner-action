@@ -135,6 +135,8 @@ func prepareFargateTask(params Config) (*TaskRunner, aws.Config) {
 		},
 	}
 
+	log.Printf("Task specification: %v", taskSpecs)
+
 	// modify task input if command is specified
 	if len(params.ContainerMakeTarget) > 0 {
 		taskDefinition := &ecs.DescribeTaskDefinitionInput{
