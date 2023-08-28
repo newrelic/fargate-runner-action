@@ -48,7 +48,7 @@ module "iam_policy_fargate" {
 
   name        = "test_prerelease-${random_string.random_suffix.result}"
   path        = "/"
-  description = "Policy for Fargate task to provision ec2 instances and logwatch"
+  description = "Policy for Fargate task to provision EC2 instances, assign them roles and access Terraform state S3 bucket"
 
   policy = <<EOF
 {
@@ -58,6 +58,19 @@ module "iam_policy_fargate" {
             "Action": "ec2:*",
             "Effect": "Allow",
             "Resource": "*"
+        },
+        {
+            "Action": "iam:PassRole",
+            "Condition": {
+                "StringLike": {
+                    "iam:PassedToService": [
+                        "ec2.amazonaws.com"
+                    ]
+                }
+            },
+            "Effect": "Allow",
+            "Resource": "*",
+            "Sid": "AllowPassingRoleToCreatedEC2Instances"
         },
         {
             "Action": "s3:*",
