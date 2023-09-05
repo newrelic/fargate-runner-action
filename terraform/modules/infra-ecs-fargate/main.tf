@@ -42,7 +42,7 @@ module "cloudwatch_log-group" {
 #########################################
 # IAM Policy Fargate
 #########################################
-module "iam_policy_fargate" {
+module "iam_policy_fargate_task" {
   source  = "registry.terraform.io/terraform-aws-modules/iam/aws//modules/iam-policy"
   version = "5.1.0"
 
@@ -50,25 +50,54 @@ module "iam_policy_fargate" {
   path        = "/"
   description = "Policy for Fargate task to provision ec2 instances and logwatch"
 
-  policy = <<EOF
-{
-    "Version": "2012-10-17",
-    "Statement": [
-        {
-            "Action": "ec2:*",
-            "Effect": "Allow",
-            "Resource": "*"
-        },
-        {
-            "Action": "s3:*",
-            "Effect": "Allow",
-            "Resource": ["${var.s3_terraform_bucket_arn}", "${var.s3_terraform_bucket_arn}/*"]
-        }
-    ]
-}
-EOF
+  policy = data.aws_iam_policy_document.iam_policy_document_fargate_task.json
 
   tags = var.tags
+}
+
+# Reference: https://developer.hashicorp.com/terraform/language/settings/backends/s3#s3-bucket-permissions
+data "aws_iam_policy_document" "terraform_s3_state_bucket_access" {
+  statement {
+    actions = [
+      "s3:ListBucket",
+    ]
+
+    resources = [
+      "${var.s3_terraform_bucket_arn}"
+    ]
+  }
+
+  statement {
+    actions = [
+      "s3:GetObject",
+      "s3:PutObject",
+      "s3:DeleteObject",
+    ]
+
+    resources = [
+      "${var.s3_terraform_bucket_arn}/*",
+    ]
+  }
+}
+
+# These rights were provided by default by this module, historically. Ideally, users of this module should provide their
+# minimum set of necessary rights for the task runtime via the task_runtime_custom_policies variable
+data "aws_iam_policy_document" "ec2_admin_rights" {
+  statement {
+    actions = [
+      "ec2:*",
+    ]
+
+    resources = [
+      "*"
+    ]
+  }
+}
+
+data "aws_iam_policy_document" "iam_policy_document_fargate_task" {
+  source_policy_documents = [data.aws_iam_policy_document.terraform_s3_state_bucket_access.json]
+
+  override_policy_documents = var.task_runtime_custom_policies == null ? [data.aws_iam_policy_document.ec2_admin_rights.json] : var.task_runtime_custom_policies
 }
 
 
@@ -84,7 +113,7 @@ module "iam_assumable_role_custom" {
   custom_role_trust_policy = data.aws_iam_policy_document.custom_trust_policy.json
 
   custom_role_policy_arns = [
-    module.iam_policy_fargate.arn
+    module.iam_policy_fargate_task.arn
   ]
 
   role_permissions_boundary_arn = var.iam_permissions_boundary_policy_arn

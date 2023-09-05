@@ -51,7 +51,7 @@ variable "task_name_prefix" {
 }
 
 variable "task_custom_policies" {
-  description = "Task custom policies json"
+  description = "Task *execution (launching)* custom policies json. The rights provided here will be added to the role *launching* the Fargate task. Note that these rights allow, for instance, reading an AWS Secret that is passed to the task as an environment variable (through the task_secrets variable) when *launching* it. These rights are different from the ones the processes running inside of the Fargate task have. For instance, if the task needs to launch some EC2 instances, you'd need to give it ec2:* rights through the task_runtime_custom_policies variable."
   type    = list(string)
   default = []
 }
@@ -63,6 +63,12 @@ variable "task_secrets" {
     valueFrom = string
   }))
   default = []
+}
+
+variable "task_runtime_custom_policies" {
+  description = "Task *runtime* custom policies json. The rights provided here will be available to the processes running inside of the launched Fargate task. For instance, if the task needs to launch some EC2 instances, you'd need to give it the required ec2:* rights through this variable. The task is always given the minimum permissions to access the Terraform S3 state bucket. If this variable is not provided, ec2:* rights will be given to guarantee the backwards compatibility of this module. Ideally, users of this module should provide their minimum set of necessary rights for the task runtime via this variable."
+  type    = list(string)
+  default = null
 }
 
 variable "efs_volume_name" {
