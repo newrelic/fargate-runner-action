@@ -110,7 +110,7 @@ data "aws_iam_policy_document" "custom_trust_policy" {
 #########################################
 module "ecs-fargate-task-definition" {
   source  = "registry.terraform.io/cn-terraform/ecs-fargate-task-definition/aws"
-  version = "1.0.29"
+  version = "1.0.35"
 
   container_image              = var.task_container_image
   container_name               = var.task_container_name
