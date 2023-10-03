@@ -177,6 +177,7 @@ module "ecs-fargate-task-definition" {
   ecs_task_execution_role_custom_policies = var.task_custom_policies
   permissions_boundary                    = var.iam_permissions_boundary_policy_arn
 
+  environment = var.task_environment
   secrets = var.task_secrets
 
   log_configuration = {
