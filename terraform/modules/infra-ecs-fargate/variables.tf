@@ -45,6 +45,15 @@ variable "task_container_name" {
   type        = string
 }
 
+variable "task_environment" {
+  type = list(object({
+    name  = string
+    value = string
+  }))
+  description = "The environment variables to pass to the container."
+  default     = []
+}
+
 variable "task_name_prefix" {
   description = "Task name prefix"
   type        = string
