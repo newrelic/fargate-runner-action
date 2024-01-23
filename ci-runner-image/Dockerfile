@@ -7,7 +7,7 @@ ARG REPO_NAME_ARG
 ARG GIT_CLONE_URL_ARG
 
 ARG ANSIBLE_VERSION="6.5.0"
-ARG GO_VERSION="1.19.5"
+ARG GO_VERSION="1.21.6"
 
 ENV REF=$REF_ARG
 ENV ANSIBLE_INVENTORY="$ANSIBLE_INVENTORY_FOLDER_ARG/$ANSIBLE_INVENTORY_FILE_ARG"
@@ -35,6 +35,12 @@ RUN apt-get install -y gnupg software-properties-common
 RUN curl -fsSL https://apt.releases.hashicorp.com/gpg | apt-key add -
 RUN add-apt-repository --yes --update "deb [arch=amd64] https://apt.releases.hashicorp.com $(lsb_release -cs) main" \
     && apt install -y terraform
+
+
+# Requirements to manage EC2 instances using SSM
+RUN python3 -m pip install boto3 && \
+    curl "https://s3.amazonaws.com/session-manager-downloads/plugin/latest/ubuntu_64bit/session-manager-plugin.deb" -o "session-manager-plugin.deb" && \
+    dpkg -i session-manager-plugin.deb
 
 RUN mkdir ~/.ssh/
 
