@@ -19,8 +19,8 @@ ssh-keyscan -t rsa github.com >> ~/.ssh/known_hosts
 if [ -z "${GIT_CLONE_URL}" ]; then
     GIT_CLONE_URL=https://github.com/"${REPO_NAME}".git
 fi
-echo "cloning repo at ${GIT_CLONE_URL}"
-git clone --config core.sshCommand="ssh -Tv -i ~/.ssh/caos-dev-arm.cer" "${GIT_CLONE_URL}" /srv/"${REPO_NAME}"
+
+git clone --config core.sshCommand="ssh -i ~/.ssh/caos-dev-arm.cer" "${GIT_CLONE_URL}" /srv/"${REPO_NAME}"
 
 pushd "/srv/$REPO_NAME"
 
