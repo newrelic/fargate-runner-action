@@ -18,7 +18,7 @@ ENV GIT_CLONE_URL=$GIT_CLONE_URL_ARG
 VOLUME /srv/runner/inventory/
 
 RUN apt-get update
-RUN DEBIAN_FRONTEND=noninteractive apt install -y make wget unzip git gcc curl jq python3
+RUN DEBIAN_FRONTEND=noninteractive apt install -y make wget unzip git gcc curl jq python3 ssh
 
 RUN curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py && \
     python3 get-pip.py --user && \
