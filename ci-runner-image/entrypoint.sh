@@ -10,6 +10,10 @@ fi
 echo "$SSH_KEY" | base64 --decode > ~/.ssh/caos-dev-arm.cer
 chmod 600  ~/.ssh/caos-dev-arm.cer
 
+# Loading CrowdStrike Ansible Role Key
+echo "$CROWDSTRIKE_ANSIBLE_ROLE_KEY" | base64 --decode > ~/.ssh/crowdstrike_ansible_role_key
+chmod 600  ~/.ssh/crowdstrike_ansible_role_key
+
 ssh-keyscan -t rsa github.com >> ~/.ssh/known_hosts
 
 if [ -z "${GIT_CLONE_URL}" ]; then
