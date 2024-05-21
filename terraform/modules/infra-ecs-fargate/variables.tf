@@ -35,6 +35,12 @@ variable "s3_terraform_bucket_arn" {
   type        = string
 }
 
+variable "dynamodb_terraform_lock_table_arn" {
+  description = "DynamoDB table ARN for ECS cluster permissions"
+  default     = ""
+  type        = string
+}
+
 variable "task_container_image" {
   description = "Task definition container image"
   type        = string
@@ -61,14 +67,14 @@ variable "task_name_prefix" {
 
 variable "task_custom_policies" {
   description = "Task *execution (launching)* custom policies json. The rights provided here will be added to the role *launching* the Fargate task. Note that these rights allow, for instance, reading an AWS Secret that is passed to the task as an environment variable (through the task_secrets variable) when *launching* it. These rights are different from the ones the processes running inside of the Fargate task have. For instance, if the task needs to launch some EC2 instances, you'd need to give it ec2:* rights through the task_runtime_custom_policies variable."
-  type    = list(string)
-  default = []
+  type        = list(string)
+  default     = []
 }
 
 variable "task_secrets" {
   description = "Task secrets"
-  type = list(object({
-    name = string
+  type        = list(object({
+    name      = string
     valueFrom = string
   }))
   default = []
@@ -76,13 +82,13 @@ variable "task_secrets" {
 
 variable "task_runtime_custom_policies" {
   description = "Task *runtime* custom policies json. The rights provided here will be available to the processes running inside of the launched Fargate task. For instance, if the task needs to launch some EC2 instances, you'd need to give it the required ec2:* rights through this variable. The task is always given the minimum permissions to access the Terraform S3 state bucket. If this variable is not provided, ec2:* rights will be given to guarantee the backwards compatibility of this module. Ideally, users of this module should provide their minimum set of necessary rights for the task runtime via this variable."
-  type    = list(string)
-  default = null
+  type        = list(string)
+  default     = null
 }
 
 variable "efs_volume_name" {
-    description = "Efs volume name"
-    type        = string
+  description = "Efs volume name"
+  type        = string
 }
 
 variable "efs_volume_mount_point" {
@@ -98,8 +104,8 @@ variable "additional_efs_security_group_rules" {
 
 ### Canaries security group for EFS volume permissions
 variable "canaries_security_group" {
-    default = "sg-044ef7bc34691164a"
-    type    = string
+  default = "sg-044ef7bc34691164a"
+  type    = string
 }
 
 ## OIDC variables
@@ -117,7 +123,7 @@ variable "oidc_role_name" {
 
 
 variable "cloudwatch_log_prefix" {
-  default = "ecs"
+  default     = "ecs"
   description = "Cloudwatch log prefix for the task definition"
   type        = string
 }
@@ -142,7 +148,7 @@ variable "task_container_memory_reservation" {
 }
 
 variable "iam_permissions_boundary_policy_arn" {
-  default = ""
+  default     = ""
   description = "A policy boundary to limit the permissions granted to the IAM roles created by this module"
-  type = string
+  type        = string
 }
