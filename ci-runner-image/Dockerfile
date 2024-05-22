@@ -1,4 +1,4 @@
-FROM ubuntu:22.04 as ci
+FROM ubuntu:22.10 as ci
 
 ARG REF_ARG="master"
 ARG ANSIBLE_INVENTORY_FOLDER_ARG="/srv/runner/inventory/$REF_ARG"
