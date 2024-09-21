@@ -80,6 +80,23 @@ data "aws_iam_policy_document" "terraform_s3_state_bucket_access" {
   }
 }
 
+#https://developer.hashicorp.com/terraform/language/settings/backends/s3#dynamodb-table-permissions
+data "aws_iam_policy_document" "terraform_s3_state_lock_dynamodb" {
+  count       = var.dynamodb_terraform_lock_table_arn != "" ? 1 : 0
+  statement {
+    actions = [
+      "dynamodb:DescribeTable",
+      "dynamodb:GetItem",
+      "dynamodb:PutItem",
+      "dynamodb:DeleteItem"
+    ]
+
+    resources = [
+      var.dynamodb_terraform_lock_table_arn
+    ]
+  }
+}
+
 # These rights were provided by default by this module, historically. Ideally, users of this module should provide their
 # minimum set of necessary rights for the task runtime via the task_runtime_custom_policies variable
 data "aws_iam_policy_document" "ec2_admin_rights" {
