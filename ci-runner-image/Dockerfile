@@ -1,4 +1,4 @@
-FROM ubuntu:22.04 as ci
+FROM ubuntu:22.04 AS ci
 
 ARG REF_ARG="master"
 ARG ANSIBLE_INVENTORY_FOLDER_ARG="/srv/runner/inventory/$REF_ARG"
@@ -6,8 +6,8 @@ ARG ANSIBLE_INVENTORY_FILE_ARG="inventory.ec2"
 ARG REPO_NAME_ARG
 ARG GIT_CLONE_URL_ARG
 
-ARG ANSIBLE_VERSION="9.5.1"
-ARG GO_VERSION="1.22.7"
+ARG ANSIBLE_VERSION="10.7.0"
+ARG GO_VERSION="1.23.4"
 
 ENV REF=$REF_ARG
 ENV ANSIBLE_INVENTORY="$ANSIBLE_INVENTORY_FOLDER_ARG/$ANSIBLE_INVENTORY_FILE_ARG"
@@ -18,7 +18,7 @@ ENV GIT_CLONE_URL=$GIT_CLONE_URL_ARG
 VOLUME /srv/runner/inventory/
 
 RUN apt-get update
-RUN DEBIAN_FRONTEND=noninteractive apt install -y make wget unzip git gcc curl jq python3 ssh
+RUN DEBIAN_FRONTEND=noninteractive apt install -y make wget unzip git gcc curl jq python3 ssh gcc-aarch64-linux-gnu
 
 RUN curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py && \
     python3 get-pip.py --user && \
